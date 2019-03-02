@@ -1,16 +1,35 @@
 # windows-native-registry
 
-## Usage
+```ts
+export interface RegistryValue {
+    name: string
+    type: REG
+    value: any
+}
 
-```js
-import { getRegistryKey, listRegistrySubkeys } from 'windows-native-registry'
+export enum HK {
+    CR = 0x80000000,
+    CU = 0x80000001,
+    LM = 0x80000002,
+    U = 0x80000003,
+}
 
+export enum REG {
+    SZ = 1,
+    EXPAND_SZ = 2,
+    BINARY = 3,
+    DWORD = 4,
+}
 
-console.log(
-  getRegistryKey('HKLM', 'SOFTWARE\\Microsoft\\DirectMusic'),
-  listRegistrySubkeys('HKLM', 'SOFTWARE\\Microsoft'),
-)
+export function getRegistryKey (root: HK, path: string): {[name: string]: RegistryValue}
 
+export function getRegistryValue (root: HK, path: string, name: string): any
+
+export function setRegistryValue (root: HK, path: string, name: string, type: REG, value: string): any
+
+export function listRegistrySubkeys (root: HK, path: string): string[]
+
+export function createRegistryKey (root: HK, path: string)
+
+export function deleteRegistryKey (root: HK, path: string)
 ```
-
-For the full API look at the [typings file](./typings/windows-native-registry.d.ts).

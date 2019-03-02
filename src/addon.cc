@@ -58,7 +58,7 @@ NAN_METHOD(getKey) {
     }
     if (valueType == REG_BINARY) {
       auto val = New<v8::Array>();
-      for (int i = 0; i < dataLength; i++) {
+      for (DWORD i = 0; i < dataLength; i++) {
         Set(val, i, New((uint32_t)data[i]));
       }
       Set(obj, New("value").ToLocalChecked(), val);
@@ -71,6 +71,34 @@ NAN_METHOD(getKey) {
   }
 }
 
+NAN_METHOD(setValue) {
+  auto key = openKey(info, KEY_WRITE);
+  if (!key) {
+    return;
+  }
+
+  auto valueType = (DWORD)info[2]->IntegerValue();
+  auto name = (LPCWSTR)*v8::String::Value(info.GetIsolate(), info[3]);
+  DWORD dataLength = 0;
+
+  if (valueType == REG_SZ || valueType == REG_EXPAND_SZ) {
+    auto value = (LPCWSTR)*v8::String::Value(info.GetIsolate(), info[4]);
+    wcscpy((wchar_t*)data, value);
+    dataLength = wcslen(value) * 2 + 2;
+    data[dataLength] = 0;
+  }
+  if (valueType == REG_DWORD) {
+    *((DWORD*)&data) = (DWORD)info[4]->IntegerValue();
+  }
+
+  LSTATUS error;
+  if ((error = RegSetKeyValueW(key, NULL, name, valueType, (LPBYTE)&data, dataLength)) != ERROR_SUCCESS) {
+    info.GetReturnValue().Set((uint32_t)error);
+    return;
+  }
+
+  RegCloseKey(key);
+}
 
 NAN_METHOD(listSubkeys) {
   auto key = openKey(info, KEY_ENUMERATE_SUB_KEYS);
@@ -92,12 +120,10 @@ NAN_METHOD(listSubkeys) {
         break;
       }
       info.GetReturnValue().Set(Null());
-      break;
+      return;
     }
 
-    auto obj = New<v8::Object>();
-    auto jsName = New(reinterpret_cast<uint16_t*>(name)).ToLocalChecked();
-    Set(ret, index++, jsName);
+    Set(ret, index++, New(reinterpret_cast<uint16_t*>(name)).ToLocalChecked());
   }
 
   if (key) {
@@ -105,9 +131,34 @@ NAN_METHOD(listSubkeys) {
   }
 }
 
+NAN_METHOD(createKey) {
+  HKEY key = 0;
+  auto root = (HKEY)info[0]->IntegerValue();
+  auto path = (LPCWSTR)*v8::String::Value(info.GetIsolate(), info[1]);
+
+  LSTATUS error;
+  if ((error = RegCreateKeyExW(root, path, 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &key, NULL)) != ERROR_SUCCESS) {
+    return;
+  }
+
+  if (key) {
+    RegCloseKey(key);
+  }
+}
+
+NAN_METHOD(deleteKey) {
+  HKEY key = 0;
+  auto root = (HKEY)info[0]->IntegerValue();
+  auto path = (LPCWSTR)*v8::String::Value(info.GetIsolate(), info[1]);
+  RegDeleteKeyW(root, path);
+}
+
 NAN_MODULE_INIT(Init) {
   Export(target, "getKey", getKey);
+  Export(target, "setValue", setValue);
   Export(target, "listSubkeys", listSubkeys);
+  Export(target, "createKey", createKey);
+  Export(target, "deleteKey", deleteKey);
 }
 
 NODE_MODULE(NODE_GYP_MODULE_NAME, Init)

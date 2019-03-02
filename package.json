@@ -1,8 +1,8 @@
 {
   "name": "windows-native-registry",
-  "version": "1.0.0",
+  "version": "1.0.6",
   "main": "index.js",
-  "types": "typings/windows-native-registry.d.ts",
+  "types": "index",
   "author": "Eugene Pankov",
   "license": "MIT",
   "repository": {
@@ -16,10 +16,12 @@
   "dependencies": {
     "nan": "^2.12.1"
   },
-  "os": [
-    "win32"
-  ],
   "devDependencies": {
-    "node-gyp": "^3.8.0"
+    "@types/node": "^11.10.4",
+    "node-gyp": "^3.8.0",
+    "typescript": "^3.3.3333"
+  },
+  "scripts": {
+    "build": "tsc -d index.ts"
   }
 }
