@@ -1,0 +1,25 @@
+{
+  "name": "windows-native-registry",
+  "version": "1.0.0",
+  "main": "index.js",
+  "types": "typings/windows-native-registry.d.ts",
+  "author": "Eugene Pankov",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/Eugeny/windows-native-registry.git"
+  },
+  "homepage": "https://github.com/Eugeny/windows-native-registry",
+  "bugs": {
+    "url": "https://github.com/Eugeny/windows-native-registry/issues"
+  },
+  "dependencies": {
+    "nan": "^2.12.1"
+  },
+  "os": [
+    "win32"
+  ],
+  "devDependencies": {
+    "node-gyp": "^3.8.0"
+  }
+}
