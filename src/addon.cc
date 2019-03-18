@@ -147,10 +147,10 @@ NAN_METHOD(createKey) {
 }
 
 NAN_METHOD(deleteKey) {
-  HKEY key = 0;
   auto root = (HKEY)info[0]->IntegerValue();
   auto path = (LPCWSTR)*v8::String::Value(info.GetIsolate(), info[1]);
   RegDeleteTreeW(root, path);
+  RegDeleteKeyW(root, path);
 }
 
 NAN_MODULE_INIT(Init) {
