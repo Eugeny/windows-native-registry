@@ -78,7 +78,7 @@ NAN_METHOD(setValue) {
   }
 
   auto valueType = (DWORD)info[2]->IntegerValue();
-  auto name = (LPCWSTR)*v8::String::Value(info.GetIsolate(), info[3]);
+  std::wstring name((wchar_t*)*v8::String::Value(info.GetIsolate(), info[3]));
   DWORD dataLength = 0;
 
   if (valueType == REG_SZ || valueType == REG_EXPAND_SZ) {
@@ -92,7 +92,7 @@ NAN_METHOD(setValue) {
   }
 
   LSTATUS error;
-  if ((error = RegSetKeyValueW(key, NULL, name, valueType, (LPBYTE)&data, dataLength)) != ERROR_SUCCESS) {
+  if ((error = RegSetValueExW(key, (LPCWSTR)name.c_str(), NULL, valueType, (LPBYTE)&data, dataLength)) != ERROR_SUCCESS) {
     info.GetReturnValue().Set((uint32_t)error);
     return;
   }
@@ -150,7 +150,7 @@ NAN_METHOD(deleteKey) {
   HKEY key = 0;
   auto root = (HKEY)info[0]->IntegerValue();
   auto path = (LPCWSTR)*v8::String::Value(info.GetIsolate(), info[1]);
-  RegDeleteKeyW(root, path);
+  RegDeleteTreeW(root, path);
 }
 
 NAN_MODULE_INIT(Init) {
