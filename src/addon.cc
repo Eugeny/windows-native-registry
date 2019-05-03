@@ -6,7 +6,7 @@ using namespace Nan;
 
 HKEY openKey(const FunctionCallbackInfo<v8::Value> &info, REGSAM access) {
   HKEY ret = 0;
-  auto root = (HKEY)info[0]->IntegerValue(Nan::GetCurrentContext());
+  auto root = (HKEY)info[0]->IntegerValue(Nan::GetCurrentContext()).FromJust();
   auto path = (LPCWSTR)*v8::String::Value(info.GetIsolate(), info[1]);
 
   LSTATUS error;
@@ -77,7 +77,7 @@ NAN_METHOD(setValue) {
     return;
   }
 
-  auto valueType = (DWORD)info[2]->IntegerValue(Nan::GetCurrentContext());
+  auto valueType = (DWORD)info[2]->IntegerValue(Nan::GetCurrentContext()).FromJust();
   std::wstring name((wchar_t*)*v8::String::Value(info.GetIsolate(), info[3]));
   DWORD dataLength = 0;
 
@@ -88,7 +88,7 @@ NAN_METHOD(setValue) {
     data[dataLength] = 0;
   }
   if (valueType == REG_DWORD) {
-    *((DWORD*)&data) = (DWORD)info[4]->IntegerValue(Nan::GetCurrentContext());
+    *((DWORD*)&data) = (DWORD)info[4]->IntegerValue(Nan::GetCurrentContext()).FromJust();
   }
 
   LSTATUS error;
@@ -133,7 +133,7 @@ NAN_METHOD(listSubkeys) {
 
 NAN_METHOD(createKey) {
   HKEY key = 0;
-  auto root = (HKEY)info[0]->IntegerValue(Nan::GetCurrentContext());
+  auto root = (HKEY)info[0]->IntegerValue(Nan::GetCurrentContext()).FromJust();
   auto path = (LPCWSTR)*v8::String::Value(info.GetIsolate(), info[1]);
 
   LSTATUS error;
@@ -147,7 +147,7 @@ NAN_METHOD(createKey) {
 }
 
 NAN_METHOD(deleteKey) {
-  auto root = (HKEY)info[0]->IntegerValue(Nan::GetCurrentContext());
+  auto root = (HKEY)info[0]->IntegerValue(Nan::GetCurrentContext()).FromJust();
   auto path = (LPCWSTR)*v8::String::Value(info.GetIsolate(), info[1]);
   RegDeleteTreeW(root, path);
   RegDeleteKeyW(root, path);
