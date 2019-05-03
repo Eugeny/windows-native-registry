@@ -6,5 +6,5 @@ environment:
     - nodejs_version: "12"
 
 install:
-  - ps: Install-Product node $env:nodejs_version x64
+  - ps: Update-NodeJsInstallation (Get-NodeJsLatestBuild $env:nodejs_version) x64
   - npm i
