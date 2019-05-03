@@ -1,5 +1,7 @@
 # windows-native-registry
 
+[![Build status](https://ci.appveyor.com/api/projects/status/6c27yfv8vkav1lw0?svg=true)](https://ci.appveyor.com/project/Eugeny/windows-native-registry)
+
 ```ts
 export interface RegistryValue {
     name: string
