@@ -1,6 +1,6 @@
 {
   "name": "windows-native-registry",
-  "version": "1.0.13",
+  "version": "1.0.14",
   "main": "index.js",
   "types": "index",
   "author": "Eugene Pankov",
@@ -14,7 +14,7 @@
     "url": "https://github.com/Eugeny/windows-native-registry/issues"
   },
   "dependencies": {
-    "nan": "^2.12.1"
+    "nan": "^2.13.2"
   },
   "devDependencies": {
     "@types/node": "^11.10.4",
