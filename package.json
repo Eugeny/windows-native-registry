@@ -19,7 +19,7 @@
   "devDependencies": {
     "@types/node": "^12.7.8",
     "node-gyp": "^5.0.4",
-    "typescript": "^3.3.3333"
+    "typescript": "^3.6.3"
   },
   "scripts": {
     "build": "tsc -d index.ts"
