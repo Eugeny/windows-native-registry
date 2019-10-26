@@ -1,6 +1,6 @@
 {
   "name": "windows-native-registry",
-  "version": "1.0.14",
+  "version": "1.0.15",
   "main": "index.js",
   "types": "index",
   "author": "Eugene Pankov",
