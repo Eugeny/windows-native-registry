@@ -7,10 +7,10 @@ using namespace Nan;
 HKEY openKey(const FunctionCallbackInfo<v8::Value> &info, REGSAM access) {
   HKEY ret = 0;
   auto root = (HKEY)info[0]->IntegerValue(Nan::GetCurrentContext()).FromJust();
-  auto path = (LPCWSTR)*v8::String::Value(info.GetIsolate(), info[1]);
+  v8::String::Value path(info.GetIsolate(), info[1]);
 
   LSTATUS error;
-  if ((error = RegOpenKeyExW(root, path, 0, access, &ret)) != ERROR_SUCCESS) {
+  if ((error = RegOpenKeyExW(root, (LPCWSTR)*path, 0, access, &ret)) != ERROR_SUCCESS) {
     return 0;
   }
   return ret;
