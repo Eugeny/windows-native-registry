@@ -54,7 +54,7 @@ NAN_METHOD(getKey) {
       Set(obj, New("value").ToLocalChecked(), New(reinterpret_cast<uint16_t*>(data)).ToLocalChecked());
     }
     if (valueType == REG_DWORD) {
-      Set(obj, New("value").ToLocalChecked(), New((uint32_t)data[0]));
+      Set(obj, New("value").ToLocalChecked(), New(*(uint32_t*)&data[0]));
     }
     if (valueType == REG_BINARY) {
       auto val = New<v8::Array>();
