@@ -1,6 +1,4 @@
 # windows-native-registry
-<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->[![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors-)<!-- ALL-CONTRIBUTORS-BADGE:END -->
-
 [![Build status](https://ci.appveyor.com/api/projects/status/6c27yfv8vkav1lw0?svg=true)](https://ci.appveyor.com/project/Eugeny/windows-native-registry)
 
 ```ts
