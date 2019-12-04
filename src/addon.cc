@@ -94,6 +94,7 @@ NAN_METHOD(setValue) {
   LSTATUS error;
   if ((error = RegSetValueExW(key, (LPCWSTR)name.c_str(), NULL, valueType, (LPBYTE)&data, dataLength)) != ERROR_SUCCESS) {
     info.GetReturnValue().Set((uint32_t)error);
+    RegCloseKey(key);
     return;
   }
 
@@ -120,15 +121,14 @@ NAN_METHOD(listSubkeys) {
         break;
       }
       info.GetReturnValue().Set(Null());
+      RegCloseKey(key);
       return;
     }
 
     Set(ret, index++, New(reinterpret_cast<uint16_t*>(name)).ToLocalChecked());
   }
 
-  if (key) {
-    RegCloseKey(key);
-  }
+  RegCloseKey(key);
 }
 
 NAN_METHOD(createKey) {
