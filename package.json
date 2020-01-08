@@ -18,7 +18,7 @@
   },
   "devDependencies": {
     "@types/node": "^12.12.14",
-    "node-gyp": "^6.0.1",
+    "node-gyp": "^6.1.0",
     "typescript": "^3.7.3"
   },
   "scripts": {

@@ -409,10 +409,10 @@ nan@^2.14.0:
   resolved "https://registry.yarnpkg.com/nan/-/nan-2.14.0.tgz#7818f722027b2459a86f0295d434d1fc2336c52c"
   integrity sha512-INOFj37C7k3AfaNTtX8RhsTw7qRy7eLET14cROi9+5HAVbbHuIWUHEauBv5qT4Av2tWasiTY1Jw6puUNqRJXQg==
 
-node-gyp@^6.0.1:
-  version "6.0.1"
-  resolved "https://registry.yarnpkg.com/node-gyp/-/node-gyp-6.0.1.tgz#d59c4247df61bb343f56e2c41d9c8dc2bc361470"
-  integrity sha512-udHG4hGe3Ji97AYJbJhaRwuSOuQO7KHnE4ZPH3Sox3tjRZ+bkBsDvfZ7eYA1qwD8eLWr//193x806ss3HFTPRw==
+node-gyp@^6.1.0:
+  version "6.1.0"
+  resolved "https://registry.yarnpkg.com/node-gyp/-/node-gyp-6.1.0.tgz#64e31c61a4695ad304c1d5b82cf6b7c79cc79f3f"
+  integrity sha512-h4A2zDlOujeeaaTx06r4Vy+8MZ1679lU+wbCKDS4ZtvY2A37DESo37oejIw0mtmR3+rvNwts5B6Kpt1KrNYdNw==
   dependencies:
     env-paths "^2.2.0"
     glob "^7.1.4"
