@@ -19,6 +19,7 @@ jobs:
     - name: install, build, and test
       run: |
         yarn
+        yarn run build
         yarn run test
       env:
         CI: true
