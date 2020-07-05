@@ -2,6 +2,9 @@
   "targets": [
     {
       "target_name": "native",
+      "msvs_settings": {
+        "VCCLCompilerTool": { "ExceptionHandling": 1 },
+      },
       "sources": [
         "src/addon.cc",
       ],
@@ -9,7 +12,7 @@
         "advapi32",
       ],
       "include_dirs": [
-        "<!(node -e \"require('nan')\")"
+        "<!@(node -p \"require('node-addon-api').include\")",
       ]
     }
   ]

@@ -1,16 +1,17 @@
-#include <nan.h>
+#include <napi.h>
+#include <uv.h>
 #include <windows.h>
-using namespace Nan;
+using namespace Napi;
 #define VALUE_MAX 32767
 #define DATA_MAX (1024 * 1024)
 
-HKEY openKey(const FunctionCallbackInfo<v8::Value> &info, REGSAM access) {
+HKEY openKey(const Napi::CallbackInfo& info, REGSAM access) {
   HKEY ret = 0;
-  auto root = (HKEY)info[0]->IntegerValue(Nan::GetCurrentContext()).FromJust();
-  v8::String::Value path(info.GetIsolate(), info[1]);
+  auto root = (HKEY)(int64_t)info[0].ToNumber();
+  auto path = info[1].ToString().Utf16Value();
 
   LSTATUS error;
-  if ((error = RegOpenKeyExW(root, (LPCWSTR)*path, 0, access, &ret)) != ERROR_SUCCESS) {
+  if ((error = RegOpenKeyExW(root, (LPCWSTR)path.c_str(), 0, access, &ret)) != ERROR_SUCCESS) {
     return 0;
   }
   return ret;
@@ -19,10 +20,12 @@ HKEY openKey(const FunctionCallbackInfo<v8::Value> &info, REGSAM access) {
 static WCHAR name[VALUE_MAX];
 static BYTE data[DATA_MAX];
 
-NAN_METHOD(getKey) {
+Napi::Value getKey(const Napi::CallbackInfo& info) {
+  auto env = info.Env();
+
   auto key = openKey(info, KEY_READ);
   if (!key) {
-    return;
+    return info.Env().Null();
   }
 
   DWORD index = 0;
@@ -30,8 +33,7 @@ NAN_METHOD(getKey) {
   DWORD nameLength;
   DWORD dataLength;
 
-  auto ret = New<v8::Array>();
-  info.GetReturnValue().Set(ret);
+  auto ret = Array::New(env);
 
   LSTATUS error;
 
@@ -42,76 +44,82 @@ NAN_METHOD(getKey) {
       if (error == ERROR_NO_MORE_ITEMS) {
         break;
       }
-      info.GetReturnValue().Set(Null());
-      break;
+      return info.Env().Null();
     }
-    auto obj = New<v8::Object>();
-    auto jsName = New(reinterpret_cast<uint16_t*>(name)).ToLocalChecked();
-    Set(obj, New("name").ToLocalChecked(), jsName);
-    Set(obj, New("type").ToLocalChecked(), New((uint32_t)valueType));
+    auto obj = Object::New(env);
+    auto jsName = String::New(env, reinterpret_cast<char16_t*>(name));
+    obj.Set("name", jsName);
+    obj.Set("type", Number::New(env, (uint32_t)valueType));
     if (valueType == REG_SZ || valueType == REG_EXPAND_SZ) {
       data[dataLength] = 0;
-      Set(obj, New("value").ToLocalChecked(), New(reinterpret_cast<uint16_t*>(data)).ToLocalChecked());
+      data[dataLength + 1] = 0;
+      obj.Set("value", String::New(env, reinterpret_cast<char16_t*>(data)));
     }
     if (valueType == REG_DWORD) {
-      Set(obj, New("value").ToLocalChecked(), New(*(uint32_t*)&data[0]));
+      obj.Set("value", Number::New(env, *(uint32_t*)&data[0]));
     }
     if (valueType == REG_BINARY) {
-      auto val = New<v8::Array>();
+      auto val = Array::New(env);
       for (DWORD i = 0; i < dataLength; i++) {
-        Set(val, i, New((uint32_t)data[i]));
+        val.Set(i, Number::New(env, (uint32_t)data[i]));
       }
-      Set(obj, New("value").ToLocalChecked(), val);
+      obj.Set("value", val);
     }
-    Set(ret, index++, obj);
+    ret.Set(index++, obj);
   }
 
   if (key) {
     RegCloseKey(key);
   }
+
+  return ret;
 }
 
-NAN_METHOD(setValue) {
+Napi::Value setValue(const Napi::CallbackInfo& info) {
+  auto env = info.Env();
   auto key = openKey(info, KEY_WRITE);
   if (!key) {
-    return;
+    return env.Null();
   }
 
-  auto valueType = (DWORD)info[2]->IntegerValue(Nan::GetCurrentContext()).FromJust();
-  std::wstring name((wchar_t*)*v8::String::Value(info.GetIsolate(), info[3]));
+  auto valueType = (DWORD)(int64_t)info[2].ToNumber();
   DWORD dataLength = 0;
 
   if (valueType == REG_SZ || valueType == REG_EXPAND_SZ) {
-    auto value = (LPCWSTR)*v8::String::Value(info.GetIsolate(), info[4]);
-    wcscpy((wchar_t*)data, value);
-    dataLength = wcslen(value) * 2 + 2;
+    auto value = info[4].ToString().Utf16Value();
+    wcscpy((wchar_t*)data, (LPCWSTR)value.c_str());
+    dataLength = value.length() * 2 + 2;
     data[dataLength] = 0;
   }
   if (valueType == REG_DWORD) {
-    *((DWORD*)&data) = (DWORD)info[4]->IntegerValue(Nan::GetCurrentContext()).FromJust();
+    *((DWORD*)&data) = (DWORD)(int64_t)info[4].ToNumber();
+    dataLength = 4;
   }
+
+  auto name = info[3].ToString().Utf16Value();
 
   LSTATUS error;
   if ((error = RegSetValueExW(key, (LPCWSTR)name.c_str(), NULL, valueType, (LPBYTE)&data, dataLength)) != ERROR_SUCCESS) {
-    info.GetReturnValue().Set((uint32_t)error);
     RegCloseKey(key);
-    return;
+    return Number::New(env, (uint32_t)error);
   }
 
   RegCloseKey(key);
+  return env.Null();
 }
 
-NAN_METHOD(listSubkeys) {
+Napi::Value listSubkeys(const Napi::CallbackInfo& info) {
+  auto env = info.Env();
   auto key = openKey(info, KEY_ENUMERATE_SUB_KEYS);
   if (!key) {
-    return;
+    return env.Null();
   }
 
   DWORD index = 0;
   DWORD nameLength = VALUE_MAX - 1;
 
-  auto ret = New<v8::Array>();
-  info.GetReturnValue().Set(ret);
+  auto ret = Array::New(env);
+  return ret;
 
   LSTATUS error;
 
@@ -120,45 +128,48 @@ NAN_METHOD(listSubkeys) {
       if (error == ERROR_NO_MORE_ITEMS) {
         break;
       }
-      info.GetReturnValue().Set(Null());
       RegCloseKey(key);
-      return;
+      return env.Null();
     }
 
-    Set(ret, index++, New(reinterpret_cast<uint16_t*>(name)).ToLocalChecked());
+    ret.Set(index++, String::New(env, reinterpret_cast<char16_t*>(name)));
   }
 
   RegCloseKey(key);
+  return env.Null();
 }
 
-NAN_METHOD(createKey) {
+Napi::Value createKey(const Napi::CallbackInfo& info) {
   HKEY key = 0;
-  auto root = (HKEY)info[0]->IntegerValue(Nan::GetCurrentContext()).FromJust();
-  auto path = (LPCWSTR)*v8::String::Value(info.GetIsolate(), info[1]);
+  auto root = (HKEY)(int64_t)info[0].ToNumber();
+  auto path = (LPCWSTR)info[1].ToString().Utf16Value().c_str();
 
   LSTATUS error;
   if ((error = RegCreateKeyExW(root, path, 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &key, NULL)) != ERROR_SUCCESS) {
-    return;
+    return Number::New(info.Env(), error);
   }
 
   if (key) {
     RegCloseKey(key);
   }
+  return info.Env().Null();
 }
 
-NAN_METHOD(deleteKey) {
-  auto root = (HKEY)info[0]->IntegerValue(Nan::GetCurrentContext()).FromJust();
-  auto path = (LPCWSTR)*v8::String::Value(info.GetIsolate(), info[1]);
+Napi::Value deleteKey(const Napi::CallbackInfo& info) {
+  auto root = (HKEY)(int64_t)info[0].ToNumber();
+  auto path = (LPCWSTR)info[1].ToString().Utf16Value().c_str();
   RegDeleteTreeW(root, path);
   RegDeleteKeyW(root, path);
+  return info.Env().Null();
 }
 
-NAN_MODULE_INIT(Init) {
-  Export(target, "getKey", getKey);
-  Export(target, "setValue", setValue);
-  Export(target, "listSubkeys", listSubkeys);
-  Export(target, "createKey", createKey);
-  Export(target, "deleteKey", deleteKey);
+Napi::Object Init(Napi::Env env, Napi::Object exports) {
+  exports.Set("getKey", Napi::Function::New(env, getKey));
+  exports.Set("setValue", Napi::Function::New(env, setValue));
+  exports.Set("listSubkeys", Napi::Function::New(env, listSubkeys));
+  exports.Set("createKey", Napi::Function::New(env, createKey));
+  exports.Set("deleteKey", Napi::Function::New(env, deleteKey));
+  return exports;
 }
 
-NAN_MODULE_WORKER_ENABLED(NODE_GYP_MODULE_NAME, Init)
+NODE_API_MODULE(addon, Init)

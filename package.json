@@ -14,14 +14,16 @@
     "url": "https://github.com/Eugeny/windows-native-registry/issues"
   },
   "dependencies": {
-    "nan": "^2.14.0"
+    "node-addon-api": "^3.0.0"
   },
   "devDependencies": {
     "@types/node": "^12.12.14",
+    "mocha": "^8.0.1",
     "node-gyp": "^6.0.1",
     "typescript": "^3.7.3"
   },
   "scripts": {
-    "build": "tsc -d index.ts"
+    "build": "tsc -d index.ts",
+    "test": "mocha"
   }
 }
