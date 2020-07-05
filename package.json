@@ -24,6 +24,6 @@
   },
   "scripts": {
     "build": "tsc -d index.ts",
-    "test": "mocha"
+    "test": "node_modules/.bin/mocha"
   }
 }
