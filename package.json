@@ -14,7 +14,7 @@
     "url": "https://github.com/Eugeny/windows-native-registry/issues"
   },
   "dependencies": {
-    "node-addon-api": "^3.0.0"
+    "node-addon-api": "^3.0.1"
   },
   "devDependencies": {
     "@types/node": "^12.12.14",
