@@ -119,7 +119,6 @@ Napi::Value listSubkeys(const Napi::CallbackInfo& info) {
   DWORD nameLength = VALUE_MAX - 1;
 
   auto ret = Array::New(env);
-  return ret;
 
   LSTATUS error;
 
@@ -129,14 +128,14 @@ Napi::Value listSubkeys(const Napi::CallbackInfo& info) {
         break;
       }
       RegCloseKey(key);
-      return env.Null();
+      return Number::New(env, (uint32_t)error);
     }
 
-    ret.Set(index++, String::New(env, reinterpret_cast<char16_t*>(name)));
+    ret[index++] = String::New(env, reinterpret_cast<char16_t*>(name));
   }
 
   RegCloseKey(key);
-  return env.Null();
+  return ret;
 }
 
 Napi::Value createKey(const Napi::CallbackInfo& info) {

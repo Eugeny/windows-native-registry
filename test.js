@@ -17,6 +17,12 @@ describe('#windows-native-registry()', () => {
     assert.notEqual(mod.getRegistryKey(mod.HK.CU, K + '\\test'), null);
   });
 
+  it('should list keys', () => {
+    mod.createRegistryKey(mod.HK.CU, K + '\\test');
+    assert.equal(mod.listRegistrySubkeys(mod.HK.CU, K).length, 1);
+    assert.equal(mod.listRegistrySubkeys(mod.HK.CU, K)[0], 'test');
+  });
+
   it('should delete keys', () => {
     mod.deleteRegistryKey(mod.HK.CU, K);
     assert.equal(mod.getRegistryKey(mod.HK.CU, K), null);
