@@ -17,7 +17,7 @@
     "win32"
   ],
   "dependencies": {
-    "node-addon-api": "^3.1.0"
+    "node-addon-api": "^4.2.0"
   },
   "devDependencies": {
     "@types/node": "^15.0.2",
