@@ -54,7 +54,9 @@ export function getRegistryValue (root: HK, path: string, name: string): any {
     return key[name].value
 }
 
-export function setRegistryValue (root: HK, path: string, name: string, type: REG, value: string): any {
+export function setRegistryValue (root: HK, path: string, name: string, type: REG.MULTI_SZ, value: string[]): any
+export function setRegistryValue (root: HK, path: string, name: string, type: REG, value: string): any
+export function setRegistryValue (root: HK, path: string, name: string, type: REG, value: string|string[]): any {
     return getNative().setValue(root, path, type, name, value)
 }
 

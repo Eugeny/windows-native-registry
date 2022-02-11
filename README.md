@@ -1,5 +1,10 @@
 # windows-native-registry
-[![Build status](https://ci.appveyor.com/api/projects/status/6c27yfv8vkav1lw0?svg=true)](https://ci.appveyor.com/project/Eugeny/windows-native-registry)
+
+[![Node CI](https://github.com/Eugeny/windows-native-registry/actions/workflows/nodejs.yml/badge.svg)](https://github.com/Eugeny/windows-native-registry/actions/workflows/nodejs.yml)
+
+* No external processes.
+* Node-API
+* Electron ready
 
 ```ts
 export interface RegistryValue {
@@ -27,6 +32,8 @@ export function getRegistryKey (root: HK, path: string): {[name: string]: Regist
 export function getRegistryValue (root: HK, path: string, name: string): any
 
 export function setRegistryValue (root: HK, path: string, name: string, type: REG, value: string): any
+
+export function setRegistryValue (root: HK, path: string, name: string, type: REG.MULTI_SZ, value: string[]): any
 
 export function listRegistrySubkeys (root: HK, path: string): string[]
 
