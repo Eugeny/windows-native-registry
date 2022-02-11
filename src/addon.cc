@@ -65,6 +65,20 @@ Napi::Value getKey(const Napi::CallbackInfo& info) {
       }
       obj.Set("value", val);
     }
+    if (valueType == REG_MULTI_SZ) {
+      auto val = Array::New(env);
+      data[dataLength] = 0;
+      data[dataLength + 1] = 0;
+      DWORD pos = 0;
+      DWORD idx = 0;
+      while ( pos < (dataLength-2)) { // do not add last (empty) string
+        auto entry = String::New(env,reinterpret_cast<char16_t*>(data+pos));
+        val.Set(idx++,  entry);
+        pos += (entry.Utf16Value().length()+1) * 2 ;
+      }
+
+      obj.Set("value", val);
+    }
     ret.Set(index++, obj);
   }
 
@@ -94,6 +108,23 @@ Napi::Value setValue(const Napi::CallbackInfo& info) {
   if (valueType == REG_DWORD) {
     *((DWORD*)&data) = (DWORD)(int64_t)info[4].ToNumber();
     dataLength = 4;
+  }
+  if (valueType == REG_MULTI_SZ) {
+    if (info[4].IsArray()){
+      auto value = info[4].As<Napi::Array>();
+      uint32_t len = value.Length();
+
+      for (uint32_t idx = 0; idx < len; idx++)
+      {
+        Napi::Value entry = value[idx];
+        auto entryValue = entry.ToString().Utf16Value();
+        wcscpy((wchar_t*)(&data[dataLength]), (LPCWSTR)entryValue.c_str());
+        dataLength += entryValue.length() * 2 + 2;
+      }
+      // Add trailing null-wchar
+      data[dataLength++] = 0;
+      data[dataLength++] = 0;
+    }
   }
 
   auto name = info[3].ToString().Utf16Value();
