@@ -20,7 +20,7 @@
     "node-addon-api": "^4.3.0"
   },
   "devDependencies": {
-    "@types/node": "^15.0.2",
+    "@types/node": "^18.14.3",
     "mocha": "^8.0.1",
     "node-gyp": "^6.0.1",
     "typescript": "^4.5.5"
